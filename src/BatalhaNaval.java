@@ -9,8 +9,8 @@ public class BatalhaNaval {
     static char HORIZONTAL = 'H';
     static char VERTICAL = 'V';
 
-    public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
+    public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
         if(orientacao == HORIZONTAL) {
             if(coluna + tamanhoNavio > TAMANHO_TABULEIRO) return false;
@@ -68,14 +68,14 @@ public class BatalhaNaval {
     }
 
     public static void exibirTabuleiro(char[][] tabuleiro, boolean ocultarNavios) {
-        System.out.printf("%3s","");//espaço para alinhar letras nas colunas
+        System.out.printf("%3s ","");//espaço para alinhar letras nas colunas
         for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
             System.out.printf("%3s",COLUNAS.charAt(i)+" ");
         }
         System.out.println();
 
         for (int linha = 0; linha < TAMANHO_TABULEIRO ; linha++) {
-            System.out.printf("%2d",linha + 1);
+            System.out.printf("%2d ",linha + 1);
             for(int coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
                 char celulaTabuleiro = tabuleiro[linha][coluna];
 
