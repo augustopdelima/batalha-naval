@@ -10,6 +10,17 @@ public class BatalhaNaval {
     static char VERTICAL = 'V';
 
 
+    public static boolean haColisaoNaVertical(char[][] tabuleiro,int linha, int coluna, int tamanhoNavio) {
+        for(int i=0; i < tamanhoNavio; i++) {
+            char celulaTabuleiro = tabuleiro[linha + i][coluna];
+            boolean temNavio = Character.isDigit(celulaTabuleiro);
+            if(temNavio) return true;
+        }
+
+        return false;
+    }
+
+
     public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
         if(orientacao == HORIZONTAL) {
