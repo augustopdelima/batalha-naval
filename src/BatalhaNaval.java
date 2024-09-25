@@ -36,6 +36,12 @@ public class BatalhaNaval {
         }
     }
 
+    public static void inserirNavioVertical(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
+        for(int i=0; i < tamanhoNavio; i++) {
+            tabuleiro[linha+i][coluna] = Character.forDigit(tamanhoNavio,10);
+        }
+    }
+
     public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
         if(orientacao == HORIZONTAL) {
@@ -45,19 +51,15 @@ public class BatalhaNaval {
 
             inserirNavioHorizontal(tabuleiro, linha,coluna, tamanhoNavio);
 
-        } else {
-            if(linha + tamanhoNavio > TAMANHO_TABULEIRO) return false;
-
-            for(int i=0; i < tamanhoNavio; i++) {
-                char celulaTabuleiro = tabuleiro[linha + i][coluna];
-                boolean temNavio = Character.isDigit(celulaTabuleiro);
-                if(temNavio) return false;
-            }
-
-            for(int i=0; i < tamanhoNavio; i++) {
-                tabuleiro[linha+i][coluna] = Character.forDigit(tamanhoNavio,10);
-            }
+            return true;
         }
+
+        //posiconar na verical
+        if(linha + tamanhoNavio > TAMANHO_TABULEIRO) return false;
+
+        if(haColisaoNaVertical(tabuleiro,linha,coluna, tamanhoNavio)) return false;
+
+        inserirNavioVertical(tabuleiro, linha, coluna, tamanhoNavio);
 
         return true;
     }
