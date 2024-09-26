@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class BatalhaNaval {
     static int TAMANHO_TABULEIRO = 10;
-    static char SIMBOLO_AGUA = '~';
+    static char SIMBOLO_AGUA = '.';
     static String COLUNAS = "ABCDEFGHIJK";
     static int[] NAVIOS_ORDEM = {4,3,3,2,2,2,1,1,1,1};
     static char HORIZONTAL = 'H';
