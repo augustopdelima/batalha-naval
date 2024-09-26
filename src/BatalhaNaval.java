@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -54,14 +55,17 @@ public class BatalhaNaval {
             return true;
         }
 
-        //posiconar na verical
-        if(linha + tamanhoNavio > TAMANHO_TABULEIRO) return false;
+        if(orientacao == VERTICAL) {
+            if (linha + tamanhoNavio > TAMANHO_TABULEIRO) return false;
 
-        if(haColisaoNaVertical(tabuleiro,linha,coluna, tamanhoNavio)) return false;
+            if (haColisaoNaVertical(tabuleiro, linha, coluna, tamanhoNavio)) return false;
 
-        inserirNavioVertical(tabuleiro, linha, coluna, tamanhoNavio);
+            inserirNavioVertical(tabuleiro, linha, coluna, tamanhoNavio);
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 
     public static void posicionarNaviosAutomaticamente(char [][] tabuleiro) {
@@ -75,6 +79,41 @@ public class BatalhaNaval {
                 posicionado = tentarPosicionarNavio(tabuleiro, linha, coluna, navio,orientacao);
             }
         }
+    }
+
+    public static void posicionarNaviosManualmente(char [][] tabuleiro,Scanner scan ,String jogadorNome) {
+        for(int navio: NAVIOS_ORDEM) {
+           boolean posicionado = false;
+           while(!posicionado) {
+               System.out.println(jogadorNome+" posicione um navio de "+navio+" espaço(s) no tabuleiro.");
+
+               exibirTabuleiro(tabuleiro,false);
+
+               System.out.print("Digite a linha inicial (1-10):");
+
+               int ajusteIndice = 1;
+
+               int linha = scan.nextInt() - ajusteIndice;
+
+               System.out.print("Digite a coluna inicial (A-K):");
+
+               String colunaLetra = scan.next().toUpperCase();
+
+               int colunaIndice = COLUNAS.indexOf(colunaLetra);
+
+               System.out.print("Digite a orientação (H para horizontal, V para vertical):");
+
+               int letraInicial = 0;
+
+               char orientacao = scan.next().toUpperCase().charAt(letraInicial);
+
+               posicionado = tentarPosicionarNavio(tabuleiro,linha,colunaIndice,navio,orientacao);
+
+               if(!posicionado) {
+                   System.out.println("Posição inválida ou navio já existe nessa área.");
+               }
+           }
+       }
     }
 
     public static char[][] criaTabuleiro() {
@@ -149,7 +188,9 @@ public class BatalhaNaval {
 
       exibirTabuleiro(tabuleiro1,false);
 
+      posicionarNaviosManualmente(tabuleiro2,scanner,"Teste");
 
+      exibirTabuleiro(tabuleiro2,false);
 
 
 
