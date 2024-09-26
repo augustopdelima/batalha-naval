@@ -8,7 +8,7 @@
     - [x] Função para posicionar navios manualmente no tabuleiro
   - [ ] Modo automático
     - [x] Função para posicionar navios automaticamente no tabuleiro
-- [ ] Atacar posicão no tabuleiro
+- [ ] Atacar posição no tabuleiro
 - [ ] Verificar ganhador
 - [x] Função para criar o tabuleiro
 - [x] Exibir tabuleiro (mostrar ou não os navios)
