@@ -99,8 +99,10 @@ public class BatalhaNaval {
 
     public static void posicionarNaviosAutomaticamente(char [][] tabuleiro) {
         Random random = new Random();
+
         for (int navio: NAVIOS_ORDEM) {
             boolean posicionado = false;
+
             while (!posicionado) {
                 int linha = random.nextInt(TAMANHO_TABULEIRO);
                 int coluna = random.nextInt(TAMANHO_TABULEIRO);
@@ -126,12 +128,10 @@ public class BatalhaNaval {
                 int ajusteIndice = 1;
                 int linha = scan.nextInt() - ajusteIndice;
 
-                System.out.println();
                 System.out.print("Digite a coluna inicial (A-K): ");
                 String colunaLetra = scan.next().toUpperCase();
                 int colunaIndice = COLUNAS.indexOf(colunaLetra);
 
-                System.out.println();
                 System.out.print("Digite a orientação (H para horizontal, V para vertical): ");
                 int letraInicial = 0;
                 char orientacao = scan.next().toUpperCase().charAt(letraInicial);
@@ -165,7 +165,7 @@ public class BatalhaNaval {
 
     public static void exibirTabuleiro(char[][] tabuleiro, boolean ocultarNavios) {
         System.out.println();
-        System.out.printf("%3s ", ""); //espaço para alinhar letras nas colunas
+        System.out.printf("%3s ", ""); // Espaço para alinhar letras nas colunas
 
         for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
             System.out.printf("%3s", COLUNAS.charAt(i) + " ");
@@ -251,6 +251,43 @@ public class BatalhaNaval {
         return valida;
     }
 
+    public static boolean realizaJogadaAutomaticamente(char [][] tabuleiro, String jogador) {
+        Random random = new Random();
+        boolean valida = false;
+
+        while (!valida) {
+            int linha = random.nextInt(TAMANHO_TABULEIRO);
+            int coluna = random.nextInt(TAMANHO_TABULEIRO);
+            
+            valida = jogadaValida(tabuleiro, linha, coluna);
+
+            if (valida) {
+                boolean acertou = false;
+
+                if (tabuleiro[linha][coluna] == SIMBOLO_OCULTO) {
+                    tabuleiro[linha][coluna] = SIMBOLO_AGUA;
+                } else if (Character.isDigit(tabuleiro[linha][coluna])) {
+                    tabuleiro[linha][coluna] = SIMBOLO_NAVIO;
+                    acertou = true;
+                }
+
+                limpaTela();
+                exibirTabuleiro(tabuleiro, true);
+
+                System.out.println();
+                System.out.println("Jogou " + (linha + 1) + "" + COLUNAS.charAt(coluna));
+
+                if (acertou) {
+                    mostraMensagemTemporaria(jogador + " acertou!", false);
+                } else {
+                    mostraMensagemTemporaria(jogador + " errou!", false);
+                }
+            }
+        }
+
+        return verificaVencedor(tabuleiro);
+    }
+
 
     public static boolean realizaJogadaManualmente(Scanner scan, char[][] tabuleiro, String jogador) {
         boolean valida = false;
@@ -286,6 +323,8 @@ public class BatalhaNaval {
                 exibirTabuleiro(tabuleiro, true);
 
                 System.out.println();
+                System.out.println("Jogou " + (linha + 1) + "" + colunaLetra);
+
                 if (acertou) {
                     mostraMensagemTemporaria(jogador + " acertou!", false);
                 } else {
@@ -315,7 +354,7 @@ public class BatalhaNaval {
     }
 
     public static void mostraVencedor(String jogador) {
-        mostraMensagemTemporaria(jogador + " venceu o jogo! Parabéns!", true);
+        mostraMensagemTemporaria(jogador + " venceu o jogo!", true);
     }
 
 
@@ -329,7 +368,32 @@ public class BatalhaNaval {
       boolean temVencedor = false;
 
       if (opcao == 1) {
-        
+        String jogador1 = pegaNomeJogador(scanner, 1);
+        String jogador2 = "Computador";
+        limpaTela();
+
+        posicionarNaviosManualmente(tabuleiro1, scanner, jogador1);
+        posicionarNaviosAutomaticamente(tabuleiro2);
+
+        while (!temVencedor) {
+            if (jogada == 1) {
+                temVencedor = realizaJogadaManualmente(scanner, tabuleiro2, jogador1);
+
+                if (temVencedor) {
+                    mostraVencedor(jogador1);
+                } else {
+                    jogada = 2;
+                }
+            } else {
+                temVencedor = realizaJogadaAutomaticamente(tabuleiro1, jogador2);
+
+                if (temVencedor) {
+                    mostraVencedor(jogador2);
+                } else {
+                    jogada = 1;
+                }
+            }
+        }
       } else {
         String jogador1 = pegaNomeJogador(scanner, 1);
         String jogador2 = pegaNomeJogador(scanner, 2);
@@ -340,6 +404,7 @@ public class BatalhaNaval {
 
         while (!temVencedor) {
             if (jogada == 1) {
+
                 temVencedor = realizaJogadaManualmente(scanner, tabuleiro2, jogador1);
                 if (temVencedor) {
                     mostraVencedor(jogador1);
@@ -348,6 +413,7 @@ public class BatalhaNaval {
                 }
             } else {
                 temVencedor = realizaJogadaManualmente(scanner, tabuleiro1, jogador2);
+
                 if (temVencedor) {
                     mostraVencedor(jogador2);
                 } else {
