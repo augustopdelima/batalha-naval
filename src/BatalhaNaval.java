@@ -9,8 +9,7 @@ public class BatalhaNaval {
     static char SIMBOLO_NAVIO = 'X';
     static char SIMBOLO_OCULTO = '?';
     static String COLUNAS = "ABCDEFGHIJK";
-    //static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
-    static int[] NAVIOS_ORDEM = {2};
+    static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
     static char HORIZONTAL = 'H';
     static char VERTICAL = 'V';
 
