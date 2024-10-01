@@ -256,13 +256,14 @@ public class BatalhaNaval {
                 System.out.println("Vez de " + jogador1);
 
                 boolean acertou = realizaJogadaManualmente(scanner,tabuleiro2,jogador1);
+
                 if(acertou) --totalNaviosJogador2;
 
                 temVencedor = verificaVencedor(totalNaviosJogador2);
 
                 exibirTotalDeNavios(jogador2,totalNaviosJogador2);
 
-                if(!temVencedor) jogadorDaRodada = jogador2;
+                if(!temVencedor && !acertou) jogadorDaRodada = jogador2;
 
             }else {
                 System.out.println("Vez de " + jogador2);
@@ -273,7 +274,7 @@ public class BatalhaNaval {
                 temVencedor = verificaVencedor(totalNaviosJogador1);
                 exibirTotalDeNavios(jogador1,totalNaviosJogador1);
 
-                if(!temVencedor) jogadorDaRodada = jogador1;
+                if(!temVencedor && !acertou) jogadorDaRodada = jogador1;
             }
         }
 
@@ -314,7 +315,7 @@ public class BatalhaNaval {
 
                 exibirTotalDeNavios(jogador2, totalNaviosJogador2);
 
-                if(!temVencedor) jogadorDaRodada = jogador2;
+                if(!temVencedor && !acertou) jogadorDaRodada = jogador2;
 
             }else {
 
@@ -325,10 +326,10 @@ public class BatalhaNaval {
 
                 temVencedor = verificaVencedor(totalNaviosJogador1);
 
-
                 exibirTotalDeNavios(jogadorNome,totalNaviosJogador1);
 
-                if(!temVencedor) jogadorDaRodada = jogadorNome;
+
+                if(!temVencedor && !acertou) jogadorDaRodada = jogadorNome;
             }
         }
 
