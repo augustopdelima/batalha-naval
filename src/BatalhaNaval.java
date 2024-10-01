@@ -8,21 +8,17 @@ public class BatalhaNaval {
     static char SIMBOLO_AGUA = '~';
     static char SIMBOLO_NAVIO = 'X';
     static char SIMBOLO_OCULTO = '?';
-    static String COLUNAS = "ABCDEFGHIJK";
+    static String COLUNAS = "ABCDEFGHIJ";
     static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
     static char HORIZONTAL = 'H';
     static char VERTICAL = 'V';
+    static int totalNaviosJogador1 = 20;
+    static int totalNaviosJogador2 = 20;
 
 
     public static void mostraMensagemTemporaria(String mensagem, boolean limparTela) {
         if (limparTela) limpaTela();
         System.out.print(mensagem);
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
 
         limpaTela();
     }
@@ -77,8 +73,16 @@ public class BatalhaNaval {
         }
     }
 
+    public static boolean posicaoValida(int linha, int coluna) {
+        if(linha  < 0 || linha >= TAMANHO_TABULEIRO) return false;
+        if(coluna < 0 || coluna >= TAMANHO_TABULEIRO) return false;
+        return true;
+    }
 
     public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
+
+        if(!posicaoValida(linha,coluna)) return false;
+
         if (orientacao == HORIZONTAL) {
             if (coluna + tamanhoNavio > TAMANHO_TABULEIRO) return false;
             if (haColisaoNaHorizontal(tabuleiro, linha, coluna, tamanhoNavio)) return false;
@@ -127,7 +131,7 @@ public class BatalhaNaval {
                 int ajusteIndice = 1;
                 int linha = scan.nextInt() - ajusteIndice;
 
-                System.out.print("Digite a coluna inicial (A-K): ");
+                System.out.print("Digite a coluna inicial (A-J): ");
                 String colunaLetra = scan.next().toUpperCase();
                 int colunaIndice = COLUNAS.indexOf(colunaLetra);
 
@@ -138,14 +142,14 @@ public class BatalhaNaval {
                 posicionado = tentarPosicionarNavio(tabuleiro,linha,colunaIndice,navio,orientacao);
 
                 if (!posicionado) {
-                    mostraMensagemTemporaria("Posição inválida ou navio já existe nessa área", true);
+                    mostraMensagemTemporaria("Posição inválida ou navio já existe nessa área\n", true);
                 }
             }
 
             limpaTela();
         }
 
-        mostraMensagemTemporaria(jogador + " acabou de posicionar todos seus navios no tabuleiro", true);
+        mostraMensagemTemporaria(jogador + " acabou de posicionar todos seus navios no tabuleiro\n", true);
     }
 
 
@@ -201,7 +205,142 @@ public class BatalhaNaval {
     }
 
 
-    public static int exibirMenu(Scanner scan) {
+    public static int escolherPosicionamentoNavios(String jogador, Scanner scan) {
+        System.out.println(jogador +", escolha como deseja posicionar seus navios (1-Manual, 2-Automático)!");
+
+        System.out.print("Digite a sua escolha:");
+        int escolha = scan.nextInt();
+
+        while (escolha != 1 && escolha != 2){
+            System.out.println("Opção inválida!");
+            System.out.print("Digite a sua escolha:");
+            escolha = scan.nextInt();
+        }
+
+        return escolha;
+    }
+
+
+    public static void posicionarNavios(char [][]tabuleiro, String jogador, int escolha, Scanner scan) {
+        switch (escolha) {
+            case 1 -> posicionarNaviosManualmente(tabuleiro,scan,jogador);
+            case 2 -> posicionarNaviosAutomaticamente(tabuleiro);
+            default -> mostraMensagemTemporaria("Opção inválida!", true);
+        }
+    }
+
+    public static void jogadorVsJogador(Scanner scanner) {
+        mostraMensagemTemporaria("Modo de jogo: Jogador vs Jogador", true);
+        char[][] tabuleiro1 = criaTabuleiro();
+        char[][] tabuleiro2 = criaTabuleiro();
+
+        String jogador1 = pegaNomeJogador(scanner, 1);
+        int escolhaPosicionarNaviosJogador1 = escolherPosicionamentoNavios(jogador1, scanner);
+        posicionarNavios(tabuleiro1, jogador1, escolhaPosicionarNaviosJogador1, scanner);
+        scanner.nextLine();
+        String jogador2 = pegaNomeJogador(scanner, 2);
+        int escolhaPosicionarNaviosJogador2 = escolherPosicionamentoNavios(jogador2, scanner);
+        posicionarNavios(tabuleiro2, jogador2, escolhaPosicionarNaviosJogador2, scanner);
+
+        String jogadorDaRodada = new Random().nextBoolean() ? jogador1 : jogador2;
+        System.out.println(jogadorDaRodada + " começa!");
+
+        boolean temVencedor = false;
+
+        totalNaviosJogador1 = 20;
+        totalNaviosJogador2 = 20;
+
+        while(!temVencedor) {
+            if(jogadorDaRodada.equals(jogador1)) {
+
+                System.out.println("Vez de " + jogador1);
+
+                boolean acertou = realizaJogadaManualmente(scanner,tabuleiro2,jogador1);
+                if(acertou) --totalNaviosJogador2;
+
+                temVencedor = verificaVencedor(totalNaviosJogador2);
+
+                exibirTotalDeNavios(jogador2,totalNaviosJogador2);
+
+                if(!temVencedor) jogadorDaRodada = jogador2;
+
+            }else {
+                System.out.println("Vez de " + jogador2);
+
+                boolean acertou = realizaJogadaManualmente(scanner,tabuleiro1,jogador2);
+                if(acertou) --totalNaviosJogador1;
+
+                temVencedor = verificaVencedor(totalNaviosJogador1);
+                exibirTotalDeNavios(jogador1,totalNaviosJogador1);
+
+                if(!temVencedor) jogadorDaRodada = jogador1;
+            }
+        }
+
+        mostraMensagemTemporaria("O jogador:"+jogadorDaRodada+" venceu!!",true);
+
+    }
+
+
+    public static void jogadorVsComputador(Scanner scanner) {
+        mostraMensagemTemporaria("Modo de jogo: Jogador vs Computador", true);
+        char[][] jogadorTabuleiro = criaTabuleiro();
+        char[][] computadorTabuleiro = criaTabuleiro();
+
+        String jogadorNome = pegaNomeJogador(scanner, 1);
+        int escolhaPosicionarNaviosJogador1 = escolherPosicionamentoNavios(jogadorNome, scanner);
+        posicionarNavios(jogadorTabuleiro, jogadorNome, escolhaPosicionarNaviosJogador1, scanner);
+
+        posicionarNaviosAutomaticamente(computadorTabuleiro);
+
+        String jogador2 = "Computador";
+        String jogadorDaRodada = new Random().nextBoolean() ? jogadorNome : jogador2;
+        System.out.println(jogadorDaRodada + " começa!");
+
+        boolean temVencedor = false;
+
+        totalNaviosJogador1 = 20;
+        totalNaviosJogador2 = 20;
+
+        while(!temVencedor) {
+
+            if(jogadorDaRodada.equals(jogadorNome)) {
+                System.out.println("Vez de " + jogadorNome);
+                boolean acertou = realizaJogadaManualmente(scanner,computadorTabuleiro,jogadorNome);
+
+                if(acertou) --totalNaviosJogador2;
+
+                temVencedor = verificaVencedor(totalNaviosJogador2);
+
+                exibirTotalDeNavios(jogador2, totalNaviosJogador2);
+
+                if(!temVencedor) jogadorDaRodada = jogador2;
+
+            }else {
+
+                System.out.println("Vez de " + jogador2);
+                boolean acertou = realizaJogadaAutomaticamente(jogadorTabuleiro,jogador2);
+
+                if(acertou) --totalNaviosJogador1;
+
+                temVencedor = verificaVencedor(totalNaviosJogador1);
+
+
+                exibirTotalDeNavios(jogadorNome,totalNaviosJogador1);
+
+                if(!temVencedor) jogadorDaRodada = jogadorNome;
+            }
+        }
+
+        mostraMensagemTemporaria("O jogador:"+jogadorDaRodada+" venceu!!",true);
+
+    }
+
+    public static void exibirTotalDeNavios(String nomeJogador, int naviosRestantes) {
+        System.out.println("Jogador "+nomeJogador+" ainda tem " + naviosRestantes +" blocos de navios");
+    }
+
+    public static void exibirMenu(Scanner scan) {
         int opcao = 0;
 
         limpaTela();
@@ -217,20 +356,18 @@ public class BatalhaNaval {
             scan.nextLine();
 
             switch (opcao) {
-                case 1 -> mostraMensagemTemporaria("Modo de jogo: Jogador vs Computador", true);
-                case 2 -> mostraMensagemTemporaria("Modo de jogo: Jogador vs Jogador", true);
+                case 1 -> jogadorVsComputador(scan);
+                case 2 -> jogadorVsJogador(scan);
                 case 3 -> fecharJogo();
                 default -> mostraMensagemTemporaria("Opção inválida! Tente novamente", true);
             }
         }
-
-        return opcao;
     }
 
 
     public static String pegaNomeJogador(Scanner scan, int numeroJogador) {
-        System.out.printf("Nome do jogador %d: ", numeroJogador);
-        String jogador = scan.nextLine();
+        System.out.printf("\nNome do jogador %d: ", numeroJogador);
+        String jogador = scan.nextLine().trim();
 
         return jogador;
     }
@@ -257,11 +394,11 @@ public class BatalhaNaval {
         while (!valida) {
             int linha = random.nextInt(TAMANHO_TABULEIRO);
             int coluna = random.nextInt(TAMANHO_TABULEIRO);
-            
+            boolean acertou = false;
             valida = jogadaValida(tabuleiro, linha, coluna);
 
             if (valida) {
-                boolean acertou = false;
+
 
                 if (tabuleiro[linha][coluna] == SIMBOLO_OCULTO) {
                     tabuleiro[linha][coluna] = SIMBOLO_AGUA;
@@ -277,14 +414,16 @@ public class BatalhaNaval {
                 System.out.println("Jogou " + (linha + 1) + "" + COLUNAS.charAt(coluna));
 
                 if (acertou) {
-                    mostraMensagemTemporaria(jogador + " acertou!", false);
+                    mostraMensagemTemporaria(jogador + " acertou!\n", false);
                 } else {
-                    mostraMensagemTemporaria(jogador + " errou!", false);
+                    mostraMensagemTemporaria(jogador + " errou!\n", false);
                 }
+
+                return acertou;
             }
         }
 
-        return verificaVencedor(tabuleiro);
+        return false;
     }
 
 
@@ -295,21 +434,23 @@ public class BatalhaNaval {
             int ajusteIndice = 1;
             exibirTabuleiro(tabuleiro, true);
 
+            boolean acertou = false;
+
             System.out.println();
             System.out.println("Jogada de " + jogador);
-    
+
             System.out.println();
             System.out.print("Digite a linha do lance (1-10): ");
             int linha = scan.nextInt() - ajusteIndice;
 
-            System.out.print("Digite a coluna do lance (A-K): ");
+            System.out.print("Digite a coluna do lance (A-J): ");
             String colunaLetra = scan.next().toUpperCase();
             int colunaIndice = COLUNAS.indexOf(colunaLetra);
-    
+
             valida = jogadaValida(tabuleiro, linha, colunaIndice);
 
             if (valida) {
-                boolean acertou = false;
+
 
                 if (tabuleiro[linha][colunaIndice] == SIMBOLO_OCULTO) {
                     tabuleiro[linha][colunaIndice] = SIMBOLO_AGUA;
@@ -325,31 +466,23 @@ public class BatalhaNaval {
                 System.out.println("Jogou " + (linha + 1) + "" + colunaLetra);
 
                 if (acertou) {
-                    mostraMensagemTemporaria(jogador + " acertou!", false);
+                    mostraMensagemTemporaria(jogador + " acertou!\n", false);
                 } else {
-                    mostraMensagemTemporaria(jogador + " errou!", false);
+                    mostraMensagemTemporaria(jogador + " errou!\n", false);
                 }
+
+                return acertou;
             } else {
                 mostraMensagemTemporaria("Jogada inválida! Tente novamente", true);
             }
         }
 
-        return verificaVencedor(tabuleiro);
+        return false;
     }
 
 
-    public static boolean verificaVencedor(char[][] tabuleiro) {
-        boolean temNavio = false;
-
-        for (int linha = 0; linha < TAMANHO_TABULEIRO; linha++) {
-            for (int coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
-                if (Character.isDigit(tabuleiro[linha][coluna])) {
-                    temNavio = true;
-                }
-            }
-        }
-
-        return !temNavio;
+    public static boolean verificaVencedor(int totalNaviosRestantes) {
+        return totalNaviosRestantes == 0;
     }
 
     public static void mostraVencedor(String jogador) {
@@ -358,69 +491,11 @@ public class BatalhaNaval {
 
 
     public static void main(String[] args) {
-      char[][] tabuleiro1 = criaTabuleiro();
-      char[][] tabuleiro2 = criaTabuleiro();
+
       Scanner scanner = new Scanner(System.in);
+      exibirMenu(scanner);
 
-      int opcao = exibirMenu(scanner);
-      int jogada = 1;
-      boolean temVencedor = false;
-
-      if (opcao == 1) {
-        String jogador1 = pegaNomeJogador(scanner, 1);
-        String jogador2 = "Computador";
-        limpaTela();
-
-        posicionarNaviosManualmente(tabuleiro1, scanner, jogador1);
-        posicionarNaviosAutomaticamente(tabuleiro2);
-
-        while (!temVencedor) {
-            if (jogada == 1) {
-                temVencedor = realizaJogadaManualmente(scanner, tabuleiro2, jogador1);
-
-                if (temVencedor) {
-                    mostraVencedor(jogador1);
-                } else {
-                    jogada = 2;
-                }
-            } else {
-                temVencedor = realizaJogadaAutomaticamente(tabuleiro1, jogador2);
-
-                if (temVencedor) {
-                    mostraVencedor(jogador2);
-                } else {
-                    jogada = 1;
-                }
-            }
-        }
-      } else {
-        String jogador1 = pegaNomeJogador(scanner, 1);
-        String jogador2 = pegaNomeJogador(scanner, 2);
-        limpaTela();
-
-        posicionarNaviosManualmente(tabuleiro1, scanner, jogador1);
-        posicionarNaviosManualmente(tabuleiro2, scanner, jogador2);
-
-        while (!temVencedor) {
-            if (jogada == 1) {
-
-                temVencedor = realizaJogadaManualmente(scanner, tabuleiro2, jogador1);
-                if (temVencedor) {
-                    mostraVencedor(jogador1);
-                } else {
-                    jogada = 2;
-                }
-            } else {
-                temVencedor = realizaJogadaManualmente(scanner, tabuleiro1, jogador2);
-
-                if (temVencedor) {
-                    mostraVencedor(jogador2);
-                } else {
-                    jogada = 1;
-                }
-            }
-        }
-      }
+      scanner.close();
    }
 }
 
