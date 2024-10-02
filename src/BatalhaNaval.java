@@ -298,7 +298,8 @@ public class BatalhaNaval {
             }
         }
 
-        mostraMensagemTemporaria("O jogador " + jogadorDaRodada + " venceu!", true);
+        mostraVencedor(jogadorDaRodada);
+        exibirMenu(scanner);
     }
 
 
@@ -345,7 +346,8 @@ public class BatalhaNaval {
             }
         }
 
-        mostraMensagemTemporaria("O jogador " + jogadorDaRodada + " venceu!", true);
+        mostraVencedor(jogadorDaRodada);
+        exibirMenu(scanner);
     }
 
 
