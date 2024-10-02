@@ -75,20 +75,20 @@ public class BatalhaNaval {
 
 
     public static boolean posicaoValida(int linha, int coluna) {
-        if(linha  < 0 || linha >= TAMANHO_TABULEIRO) return false;
-        if(coluna < 0 || coluna >= TAMANHO_TABULEIRO) return false;
+        if (linha  < 0 || linha >= TAMANHO_TABULEIRO) return false;
+        if (coluna < 0 || coluna >= TAMANHO_TABULEIRO) return false;
         return true;
     }
 
 
     public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
-        if(!posicaoValida(linha,coluna)) return false;
+        if (!posicaoValida(linha, coluna)) return false;
 
         if (orientacao == HORIZONTAL) {
             if (coluna + tamanhoNavio > TAMANHO_TABULEIRO) return false;
             if (haColisaoNaHorizontal(tabuleiro, linha, coluna, tamanhoNavio)) return false;
-            inserirNavioHorizontal(tabuleiro, linha,coluna, tamanhoNavio);
+            inserirNavioHorizontal(tabuleiro, linha, coluna, tamanhoNavio);
             return true;
         }
 
@@ -113,7 +113,7 @@ public class BatalhaNaval {
                 int linha = random.nextInt(TAMANHO_TABULEIRO);
                 int coluna = random.nextInt(TAMANHO_TABULEIRO);
                 char orientacao = random.nextBoolean() ? HORIZONTAL : VERTICAL;
-                posicionado = tentarPosicionarNavio(tabuleiro, linha, coluna, navio,orientacao);
+                posicionado = tentarPosicionarNavio(tabuleiro, linha, coluna, navio, orientacao);
             }
         }
     }
