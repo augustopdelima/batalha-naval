@@ -14,6 +14,7 @@ public class BatalhaNaval {
     static char VERTICAL = 'V';
     static int totalNaviosJogador1;
     static int totalNaviosJogador2;
+    static int NAVIO_PEQUENO = 1;
 
 
     public static void mostraMensagemTemporaria(String mensagem, boolean limparTela) {
@@ -44,11 +45,19 @@ public class BatalhaNaval {
         }
     }
 
+    public  static boolean haNavioNaCelula(char[][] tabuleiro, int linha, int coluna) {
+        char celulaTabuleiro = tabuleiro[linha][coluna];
+        return Character.isDigit(celulaTabuleiro);
+    }
+
+    public static void inserirNavio(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
+        tabuleiro[linha][coluna] = Character.forDigit(tamanhoNavio, 10);
+    }
 
     public static boolean haColisaoNaVertical(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
         for (int i = 0; i < tamanhoNavio; i++) {
-            char celulaTabuleiro = tabuleiro[linha + i][coluna];
-            boolean temNavio = Character.isDigit(celulaTabuleiro);
+            int linhaAtualizada = linha + i;
+            boolean temNavio = haNavioNaCelula(tabuleiro,linhaAtualizada, coluna);
             if (temNavio) return true;
         }
 
@@ -58,8 +67,8 @@ public class BatalhaNaval {
 
     public static  boolean haColisaoNaHorizontal(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
         for (int i = 0; i < tamanhoNavio; i++) {
-            char celulaTabuleiro = tabuleiro[linha][coluna + i];
-            boolean temNavio = Character.isDigit(celulaTabuleiro);
+            int colunaAtualizada = coluna + i;
+            boolean temNavio = haNavioNaCelula(tabuleiro, linha, colunaAtualizada);
             if (temNavio) return true;
         }
 
@@ -67,16 +76,20 @@ public class BatalhaNaval {
     }
 
 
+
+
     public static void inserirNavioHorizontal(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
         for (int i = 0; i < tamanhoNavio; i++) {
-            tabuleiro[linha][coluna + i] = Character.forDigit(tamanhoNavio, 10);
+            int colunaAtualizada = coluna + i;
+            inserirNavio(tabuleiro,linha, colunaAtualizada, tamanhoNavio);
         }
     }
 
 
     public static void inserirNavioVertical(char[][] tabuleiro, int linha, int coluna, int tamanhoNavio) {
         for (int i = 0; i < tamanhoNavio; i++) {
-            tabuleiro[linha + i][coluna] = Character.forDigit(tamanhoNavio, 10);
+            int linhaAtualizada = linha + i;
+            inserirNavio(tabuleiro,linhaAtualizada, coluna, tamanhoNavio);
         }
     }
 
@@ -90,9 +103,18 @@ public class BatalhaNaval {
 
     public static boolean tentarPosicionarNavio(char [][] tabuleiro, int linha, int coluna, int tamanhoNavio, char orientacao) {
 
+
         if (!posicaoValida(linha, coluna)) return false;
 
-        if (orientacao == HORIZONTAL) {
+
+        if (tamanhoNavio == NAVIO_PEQUENO) {
+            if (haNavioNaCelula(tabuleiro, linha, coluna)) return false;
+            inserirNavio(tabuleiro, linha, coluna, tamanhoNavio);
+            return true;
+        }
+
+
+        if (orientacao == HORIZONTAL ) {
             if (coluna + tamanhoNavio > TAMANHO_TABULEIRO) return false;
             if (haColisaoNaHorizontal(tabuleiro, linha, coluna, tamanhoNavio)) return false;
             inserirNavioHorizontal(tabuleiro, linha, coluna, tamanhoNavio);
@@ -125,6 +147,18 @@ public class BatalhaNaval {
         }
     }
 
+    public static char pegarOrientacao(Scanner scan, int tamanhoNavio) {
+
+        if(tamanhoNavio == NAVIO_PEQUENO) return 'H';
+
+        System.out.print("Digite a orientação (H para horizontal, V para vertical): ");
+
+
+        int letraInicial = 0;
+        char orientacao = scan.next().toUpperCase().charAt(letraInicial);
+
+        return  orientacao;
+    }
 
     public static void posicionarNaviosManualmente(char [][] tabuleiro, Scanner scan, String jogador) {
         for (int navio: NAVIOS_ORDEM) {
@@ -145,9 +179,7 @@ public class BatalhaNaval {
                 String colunaLetra = scan.next().toUpperCase();
                 int colunaIndice = COLUNAS.indexOf(colunaLetra);
 
-                System.out.print("Digite a orientação (H para horizontal, V para vertical): ");
-                int letraInicial = 0;
-                char orientacao = scan.next().toUpperCase().charAt(letraInicial);
+                char orientacao = pegarOrientacao(scan, navio);
 
                 posicionado = tentarPosicionarNavio(tabuleiro, linha, colunaIndice, navio, orientacao);
 
