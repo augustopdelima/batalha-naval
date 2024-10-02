@@ -9,7 +9,8 @@ public class BatalhaNaval {
     static char SIMBOLO_NAVIO = 'X';
     static char SIMBOLO_OCULTO = '?';
     static String COLUNAS = "ABCDEFGHIJ";
-    static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    //static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+    static int[] NAVIOS_ORDEM = {4, 3, 2};
     static char HORIZONTAL = 'H';
     static char VERTICAL = 'V';
     static int totalNaviosJogador1 = 20;
@@ -19,6 +20,13 @@ public class BatalhaNaval {
     public static void mostraMensagemTemporaria(String mensagem, boolean limparTela) {
         if (limparTela) limpaTela();
         System.out.print(mensagem);
+
+        // Mantém a mensagem na tela por 3 segundos
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         limpaTela();
     }
@@ -234,6 +242,18 @@ public class BatalhaNaval {
         }
     }
 
+
+    public static int calculaNumeroTotalNavios() {
+        int soma = 0;
+
+        for (int navio : NAVIOS_ORDEM) {
+            soma += navio;
+        }
+
+        return soma;
+    }
+
+
     public static void jogadorVsJogador(Scanner scanner) {
         mostraMensagemTemporaria("Modo de jogo: Jogador vs Jogador", true);
         char[][] tabuleiro1 = criaTabuleiro();
@@ -252,26 +272,27 @@ public class BatalhaNaval {
 
         boolean temVencedor = false;
 
-        totalNaviosJogador1 = 20;
-        totalNaviosJogador2 = 20;
+        int totalNavios = calculaNumeroTotalNavios();
+        totalNaviosJogador1 = totalNavios;
+        totalNaviosJogador2 = totalNavios;
 
         while (!temVencedor) {
             if (jogadorDaRodada.equals(jogador1)) {
                 System.out.println("Vez de " + jogador1);
+                exibirTotalDeNavios(jogador2, totalNaviosJogador2);
 
                 boolean acertou = realizaJogadaManualmente(scanner, tabuleiro2, jogador1);
                 if (acertou) --totalNaviosJogador2;
                 temVencedor = verificaVencedor(totalNaviosJogador2);
-                exibirTotalDeNavios(jogador2, totalNaviosJogador2);
 
                 if (!temVencedor && !acertou) jogadorDaRodada = jogador2;
-            }else {
+            } else {
                 System.out.println("Vez de " + jogador2);
+                exibirTotalDeNavios(jogador1, totalNaviosJogador1);
 
                 boolean acertou = realizaJogadaManualmente(scanner, tabuleiro1, jogador2);
                 if (acertou) --totalNaviosJogador1;
                 temVencedor = verificaVencedor(totalNaviosJogador1);
-                exibirTotalDeNavios(jogador1, totalNaviosJogador1);
 
                 if (!temVencedor && !acertou) jogadorDaRodada = jogador1;
             }
@@ -298,8 +319,9 @@ public class BatalhaNaval {
 
         boolean temVencedor = false;
 
-        totalNaviosJogador1 = 20;
-        totalNaviosJogador2 = 20;
+        int totalNavios = calculaNumeroTotalNavios();
+        totalNaviosJogador1 = totalNavios;
+        totalNaviosJogador2 = totalNavios;
 
         while (!temVencedor) {
             if (jogadorDaRodada.equals(jogadorNome)) {
@@ -317,7 +339,7 @@ public class BatalhaNaval {
                 boolean acertou = realizaJogadaAutomaticamente(jogadorTabuleiro, jogador2);
                 if (acertou) --totalNaviosJogador1;
                 temVencedor = verificaVencedor(totalNaviosJogador1);
-                exibirTotalDeNavios(jogadorNome,totalNaviosJogador1);
+                exibirTotalDeNavios(jogadorNome, totalNaviosJogador1);
 
                 if (!temVencedor && !acertou) jogadorDaRodada = jogadorNome;
             }
@@ -358,7 +380,7 @@ public class BatalhaNaval {
 
 
     public static String pegaNomeJogador(Scanner scan, int numeroJogador) {
-        System.out.printf("\nNome do jogador %d: ", numeroJogador);
+        System.out.printf("Nome do jogador %d: ", numeroJogador);
         String jogador = scan.nextLine().trim();
 
         return jogador;
@@ -430,9 +452,6 @@ public class BatalhaNaval {
             boolean acertou = false;
 
             System.out.println();
-            System.out.println("Jogada de " + jogador);
-
-            System.out.println();
             System.out.print("Digite a linha do lance (1-10): ");
             int linha = scan.nextInt() - ajusteIndice;
 
@@ -443,8 +462,6 @@ public class BatalhaNaval {
             valida = jogadaValida(tabuleiro, linha, colunaIndice);
 
             if (valida) {
-
-
                 if (tabuleiro[linha][colunaIndice] == SIMBOLO_OCULTO) {
                     tabuleiro[linha][colunaIndice] = SIMBOLO_AGUA;
                 } else if (Character.isDigit(tabuleiro[linha][colunaIndice])) {
@@ -485,7 +502,6 @@ public class BatalhaNaval {
 
 
     public static void main(String[] args) {
-
       Scanner scanner = new Scanner(System.in);
       exibirMenu(scanner);
 
