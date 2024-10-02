@@ -12,8 +12,8 @@ public class BatalhaNaval {
     static int[] NAVIOS_ORDEM = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
     static char HORIZONTAL = 'H';
     static char VERTICAL = 'V';
-    static int totalNaviosJogador1 = 20;
-    static int totalNaviosJogador2 = 20;
+    static int totalNaviosJogador1;
+    static int totalNaviosJogador2;
 
 
     public static void mostraMensagemTemporaria(String mensagem, boolean limparTela) {
